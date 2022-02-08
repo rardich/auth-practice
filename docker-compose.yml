@@ -1,0 +1,33 @@
+services:
+  api:
+    build: .
+    container_name: api
+    env_file:
+      - app/.env
+    environment:
+      PORT: 8000
+    ports:
+      - '8000:8000'
+    networks:
+      - gateway
+    depends_on:
+      - 'db'
+    restart: on-failure
+  db:
+    container_name: db
+    image: 'postgres'
+    restart: always
+    ports:
+      - '5432:5432'
+    env_file:
+      - db.env
+    networks:
+      - gateway
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      # copy the sql script to create tables
+      # - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+
+networks:
+  gateway:
+    driver: bridge
